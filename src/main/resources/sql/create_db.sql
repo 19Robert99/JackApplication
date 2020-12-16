@@ -141,6 +141,7 @@ CREATE TABLE IF NOT EXISTS public.Builds
     id     SERIAL       NOT NULL,
     number INT          NOT NULL,
     status VARCHAR(255) NOT NULL,
+    url    TEXT         NOT NULL,
     PRIMARY KEY (id)
 );
 

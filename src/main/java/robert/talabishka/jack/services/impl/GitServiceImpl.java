@@ -3,19 +3,18 @@ package robert.talabishka.jack.services.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCommitStatus;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Component;
-import robert.talabishka.jack.model.Commit;
-import robert.talabishka.jack.model.GHRequest;
-import robert.talabishka.jack.model.Ticket;
-import robert.talabishka.jack.model.User;
+import robert.talabishka.jack.model.*;
 import robert.talabishka.jack.services.GitService;
 import robert.talabishka.jack.services.TicketService;
 import robert.talabishka.jack.services.UserService;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +28,7 @@ public class GitServiceImpl implements GitService {
     private final TicketService ticketService;
     private final UserService userService;
     private ConcurrentHashMap<String, GHRepository> projectToRepository = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, List<Build>> keyToBuilds = new ConcurrentHashMap<>();
 
     public GitServiceImpl(TicketService ticketService, UserService userService) {
         this.ticketService = ticketService;
@@ -69,14 +69,16 @@ public class GitServiceImpl implements GitService {
     }
 
     private List<Commit> mapCommits(List<GHCommit> ghCommits) {
-        return ghCommits.stream().map(this::buildCommit).collect(Collectors.toList());
+        return ghCommits.stream().map(this::buildCommit).filter(commit -> commit.getTicket() != null).collect(Collectors.toList());
     }
 
     private Commit buildCommit(GHCommit ghCommit) {
         try {
+            String ticketKey = getTicketKey(ghCommit.getCommitShortInfo().getMessage());
+            addBuildInfo(ghCommit.getLastStatus(), ticketKey);
             return Commit.builder()
                     .user(getUserByEmail(ghCommit.getAuthor().getEmail()))
-                    .ticket(getTicketByKey(ghCommit.getCommitShortInfo().getMessage()))
+                    .ticket(getTicketByKey(ticketKey))
                     .comment(ghCommit.getCommitShortInfo().getMessage())
                     .date(ghCommit.getCommitShortInfo().getCommitDate())
                     .url(ghCommit.getHtmlUrl().toURI().toString())
@@ -85,6 +87,33 @@ public class GitServiceImpl implements GitService {
             e.printStackTrace();
         }
         return new Commit();
+    }
+
+    @Override
+    public List<Build> getBuildsByTicketKey(String ticketKey){
+        List<Build> builds = keyToBuilds.get(ticketKey);
+        if (builds != null && !builds.isEmpty()){
+            return builds;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private void addBuildInfo(GHCommitStatus status, String ticketKey) {
+        if (status != null) {
+            List<Build> builds = keyToBuilds.get(ticketKey);
+
+            Build build = Build.builder()
+                    .status(status.getState().name())
+                    .url(status.getTargetUrl())
+                    .build();
+
+            if (builds != null && !builds.isEmpty()) {
+                builds.add(build);
+            } else {
+                keyToBuilds.put(ticketKey, Collections.singletonList(build));
+            }
+        }
     }
 
     private String getTicketKey(String commitComment) {
@@ -96,10 +125,10 @@ public class GitServiceImpl implements GitService {
         return null;
     }
 
-    private Ticket getTicketByKey(String commitMessage) {
+    private Ticket getTicketByKey(String key) {
         Ticket ticket = new Ticket();
-        if (StringUtils.isNoneBlank(getTicketKey(commitMessage))) {
-            ticket.setId(ticketService.getIdByKey(getTicketKey(commitMessage)));
+        if (StringUtils.isNoneBlank(key)) {
+            ticket.setId(ticketService.getIdByKey(key));
             return ticket;
         }
         return null;

@@ -19,6 +19,7 @@ import java.util.Set;
 public class Build extends BaseEntity {
     private Long number;
     private String status;
+    private String url;
     @JsonIgnore
     private Set<Ticket> tickets;
 
@@ -31,13 +32,22 @@ public class Build extends BaseEntity {
         this.number = number;
     }
 
-    @Column(name = "status")
+    @Column(name = "status", insertable = false, updatable = false)
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Column(name = "status")
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
