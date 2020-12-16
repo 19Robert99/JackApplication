@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "tickets", schema = "public", catalog = "jack")
 public class Ticket extends BaseEntity {
     private String acceptanceCriteria;

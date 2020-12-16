@@ -1,0 +1,8 @@
+language: java
+
+notifications:
+  email:
+    recipients:
+      - robert.talabishka@gmail.com
+    on_success: always
+    on_failure: always

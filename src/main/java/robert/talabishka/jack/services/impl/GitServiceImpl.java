@@ -100,8 +100,9 @@ public class GitServiceImpl implements GitService {
         Ticket ticket = new Ticket();
         if (StringUtils.isNoneBlank(getTicketKey(commitMessage))) {
             ticket.setId(ticketService.getIdByKey(getTicketKey(commitMessage)));
+            return ticket;
         }
-        return ticket;
+        return null;
     }
 
     private User getUserByEmail(String email) {
