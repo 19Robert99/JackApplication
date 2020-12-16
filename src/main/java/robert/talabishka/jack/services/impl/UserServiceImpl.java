@@ -21,4 +21,9 @@ public class UserServiceImpl extends AbstractServiceImpl<User> implements UserSe
     public User logIn(String login, String password) {
         return userRepository.logIn(login, password);
     }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.getUserByEmail(email);
+    }
 }

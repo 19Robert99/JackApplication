@@ -14,4 +14,7 @@ public interface TicketRepository extends AbstractRepository<Ticket> {
     @Modifying
     @Query(nativeQuery = true,value = "DELETE FROM watchers WHERE user_id = ?1 AND ticket_id = ?2")
     void removeWatcher(Long userId, Long ticketId);
+
+    @Query("select t.id from Ticket t where t.key = :key")
+    Long getIdByKey(String key);
 }

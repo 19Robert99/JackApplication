@@ -4,4 +4,5 @@ import robert.talabishka.jack.model.User;
 
 public interface UserService extends AbstractService<User> {
     User logIn(String login, String password);
+    User getUserByEmail(String email);
 }

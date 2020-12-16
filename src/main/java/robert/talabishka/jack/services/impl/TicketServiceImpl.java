@@ -26,4 +26,9 @@ public class TicketServiceImpl extends AbstractServiceImpl<Ticket> implements Ti
     public void removeWatcher(Long userId, Long ticketId) {
         ticketRepository.removeWatcher(userId, ticketId);
     }
+
+    @Override
+    public Long getIdByKey(String key) {
+        return ticketRepository.getIdByKey(key);
+    }
 }

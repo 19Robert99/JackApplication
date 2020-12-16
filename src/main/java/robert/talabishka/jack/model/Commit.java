@@ -17,7 +17,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "commits", schema = "public", catalog = "jack")
 public class Commit extends BaseEntity {
     private Long number;

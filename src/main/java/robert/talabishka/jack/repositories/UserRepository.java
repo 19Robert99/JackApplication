@@ -8,4 +8,7 @@ import robert.talabishka.jack.model.User;
 public interface UserRepository extends AbstractRepository<User> {
     @Query("SELECT u from User u where u.email = ?1 and u.password = ?2")
     User logIn(String login, String password);
+
+    @Query("SELECT u from User u where u.email = ?1")
+    User getUserByEmail(String email);
 }
