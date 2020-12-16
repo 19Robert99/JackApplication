@@ -3,6 +3,7 @@ package robert.talabishka.jack.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -16,15 +17,14 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Table(name = "commits", schema = "public", catalog = "jack")
 public class Commit extends BaseEntity {
     private Long number;
     private String comment;
     private Date date;
     private String url;
-    @JsonIgnore
     private User user;
-    @JsonIgnore
     private Ticket ticket;
     private Long userId;
 
@@ -83,6 +83,7 @@ public class Commit extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JsonIncludeProperties({"id", "fullName"})
     public User getUser() {
         return user;
     }
@@ -93,6 +94,7 @@ public class Commit extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ticket_id", referencedColumnName = "id", nullable = false)
+    @JsonIncludeProperties({"id", "key"})
     public Ticket getTicket() {
         return ticket;
     }
